@@ -12,8 +12,8 @@
 
  Другими словами: функция должна возвращать в неизменном виде то, что поступает ей на вход
  */
-function returnFirstArgument(p) {
-
+function returnFirstArgument (param) {
+  return param;
 };
 
 /*
@@ -30,13 +30,12 @@ function returnFirstArgument(p) {
  Пример:
    sumWithDefaults(10) вернет 110
  */
-function sumWithDefaults(a, b) {
-
-};
-
 function sumWithDefaults(a, b = 100) {
-
+  return a + b;
 };
+
+// function sumWithDefaults() {
+// };
 
 /*
  Задание 3:
@@ -48,8 +47,8 @@ function sumWithDefaults(a, b = 100) {
  */
 
 function returnFnResult(fn) {
-
-}
+  return fn(); 
+};
 
 /*
  Задание 4:
@@ -64,9 +63,14 @@ function returnFnResult(fn) {
    console.log(f()); // выведет 12
    console.log(f()); // выведет 13
  */
-function returnCounter(number) {
-   
-}
+function returnCounter (number = 0) {
+  return function () {
+    let result = ++number;
+    return result;
+  };
+};
+
+var f = returnCounter(10);
 
 /*
  Задание 5 *:
@@ -77,8 +81,13 @@ function returnCounter(number) {
  Пример:
    returnArgumentsArray(1, 2, 3) вернет [1, 2, 3]
  */
-function returnArgumentsArray() {
-}
+function returnArgumentsArray(...args) {
+  let arr = [];
+  for (let i = 0; i < arguments.length; i++) {
+      arr.push(arguments[i]);
+  };
+  return arr;
+};
 
 /*
  Задание 6 *:
@@ -95,8 +104,22 @@ function returnArgumentsArray() {
 
    console.log(newSum()) выведет 6
  */
-function bindFunction(fn) {
-}
+
+function sum(...args) {
+  let count = 0;
+  for (let i = 0; i < arguments.length; i++) {
+    count += arguments[i];
+  };
+  return count;
+};
+
+function bindFunction(fn, ...args) {
+  return function () {
+    return fn(...args);
+  };
+};
+
+var newSum = bindFunction(sum, 2, 4);
 
 export {
     returnFirstArgument,
