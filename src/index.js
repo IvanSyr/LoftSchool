@@ -11,6 +11,11 @@
    createDivWithText('loftschool') // создаст элемент div, поместит в него 'loftschool' и вернет созданный элемент
  */
 function createDivWithText(text) {
+    const element = document.createElement('div');
+
+    element.textContent = text;
+    
+    return element;
 }
 
 /*
@@ -22,6 +27,11 @@ function createDivWithText(text) {
    prepend(document.querySelector('#one'), document.querySelector('#two')) // добавит элемент переданный первым аргументом в начало элемента переданного вторым аргументом
  */
 function prepend(what, where) {
+    
+    const child = what;
+    const perent = where;
+
+    return perent.prepend(child);
 }
 
 /*
@@ -37,13 +47,26 @@ function prepend(what, where) {
       <div></div>
       <p></p>
       <a></a>
-      <span></span>
+      <span></span> 
       <p></p>
    </dody>
 
    findAllPSiblings(document.body) // функция должна вернуть массив с элементами div и span т.к. следующим соседом этих элементов является элемент с тегом P
  */
 function findAllPSiblings(where) {
+    let array = [];
+    let p = where.querySelectorAll('p');
+
+    for (let j = 0; j < p.length; j++) {
+        for (let i = 0; i < where.children.length; i++) {
+            if (where.children[i] == p[j]) {
+                array.push(where.children[i - 1]);
+            }
+
+        }   
+    }
+
+    return array;
 }
 
 /*
@@ -66,7 +89,7 @@ function findAllPSiblings(where) {
 function findError(where) {
     var result = [];
 
-    for (var child of where.childNodes) {
+    for (var child of where.children) {
         result.push(child.innerText);
     }
 
@@ -86,6 +109,13 @@ function findError(where) {
    должно быть преобразовано в <div></div><p></p>
  */
 function deleteTextNodes(where) {
+
+    for (let i = 0; i < where.childNodes.length; i++) {
+        if (where.childNodes[i].nodeType === 3) {
+            where.childNodes[i].textContent = '';
+        } 
+    }
+
 }
 
 /*
@@ -100,6 +130,15 @@ function deleteTextNodes(where) {
    должно быть преобразовано в <span><div><b></b></div><p></p></span>
  */
 function deleteTextNodesRecursive(where) {
+  
+    for (let i = 0; i < where.childNodes.length; i++) {
+        if (where.childNodes[i].nodeType === 3) {
+            where.childNodes[i].textContent = '';
+        } else {
+            deleteTextNodesRecursive(where.childNodes[i]);
+        }
+    }
+  
 }
 
 /*
@@ -123,6 +162,56 @@ function deleteTextNodesRecursive(where) {
    }
  */
 function collectDOMStat(root) {
+    let countText = 0;
+    let tagsObj = {};
+    let classesObj = {};
+
+    function collectDOMStatCopy(el) {
+        function classesObject (clas) {
+            if (clas != '') { 
+                if (!(clas in classesObj)) {
+                    classesObj[clas] = 1;
+                } else {
+                    classesObj[clas] = classesObj[clas] += 1;
+                }
+
+                return classesObj;
+            }
+        }
+
+        function tagsObject (tag) {
+                    
+            if (!(tag in tagsObj)) {
+                tagsObj[tag] = 1;
+            } else {
+                tagsObj[tag] = tagsObj[tag] += 1;
+            }
+            
+            return tagsObj;
+        }
+
+        for (let i = 0; i < el.childNodes.length; i++) {
+            if (el.childNodes[i].nodeType === 3) {
+                countText += 1;
+            } else {
+                tagsObject(el.childNodes[i].nodeName);
+                for (let j = 0; j < el.childNodes[i].classList.length; j++) {
+                    classesObject(el.childNodes[i].classList[j]);
+                }            
+                collectDOMStatCopy(el.childNodes[i]);
+            }
+        }
+
+        let obj = {
+            tags: tagsObj,
+            classes: classesObj,
+            texts: countText
+        };
+
+        return obj;
+    }
+
+    return collectDOMStatCopy(root);
 }
 
 /*
@@ -157,8 +246,8 @@ function collectDOMStat(root) {
      nodes: [div]
    }
  */
-function observeChildNodes(where, fn) {
-}
+// function observeChildNodes(where, fn) {
+// }
 
 export {
     createDivWithText,
@@ -168,5 +257,5 @@ export {
     deleteTextNodes,
     deleteTextNodesRecursive,
     collectDOMStat,
-    observeChildNodes
+    // observeChildNodes
 };
