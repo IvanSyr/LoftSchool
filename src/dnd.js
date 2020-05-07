@@ -27,6 +27,25 @@ const homeworkContainer = document.querySelector('#homework-container');
    homeworkContainer.appendChild(newDiv);
  */
 function createDiv() {
+    const getRandom = function (arg) {
+        let valume = Math.floor(Math.random() * arg);
+
+        return valume;
+    }
+
+    let element = document.createElement('div');
+    
+    element.style.position = 'absolute';
+    element.style.top = getRandom(500) + 'px';
+    element.style.left = getRandom(1200) + 'px';
+    element.style.width = getRandom(100) + 'px';
+    element.style.height = getRandom(200) + 'px';
+    element.style.backgroundColor = '#' + (Math.random().toString(16) + '000000').substring(2, 8).toUpperCase();
+
+    element.classList.add('draggable-div');
+    element.setAttribute('draggable', true);
+
+    return element;
 }
 
 /*
@@ -38,6 +57,36 @@ function createDiv() {
    addListeners(newDiv);
  */
 function addListeners(target) {
+    const arial = document.querySelectorAll('.arr');
+
+    const dragStart = function () {
+  
+    }
+    const dragEnd = function () {
+        
+    }
+    const dragOver = function (e) {
+        e.preventDefault();
+    }
+    const dragEnter = function () {
+        
+    }
+    const dragLeave = function () {
+        
+    }
+    const dragDrop = function () {
+        this.append(target);
+    }
+     
+    arial.forEach(function (item) {
+        item.addEventListener('dragover', dragOver);
+        item.addEventListener('dragenter', dragEnter);
+        item.addEventListener('dragleave', dragLeave);
+        item.addEventListener('drop', dragDrop);
+    })
+    
+    target.addEventListener('dragstart', dragStart);
+    target.addEventListener('dragend', dragEnd);
 }
 
 let addDivButton = homeworkContainer.querySelector('#addDiv');
