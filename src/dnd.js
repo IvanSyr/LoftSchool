@@ -57,8 +57,6 @@ function createDiv() {
    addListeners(newDiv);
  */
 function addListeners(target) {
-    const arial = document.querySelectorAll('.arr');
-
     const dragStart = function () {
   
     }
@@ -77,14 +75,12 @@ function addListeners(target) {
     const dragDrop = function () {
         this.append(target);
     }
-     
-    arial.forEach(function (item) {
-        item.addEventListener('dragover', dragOver);
-        item.addEventListener('dragenter', dragEnter);
-        item.addEventListener('dragleave', dragLeave);
-        item.addEventListener('drop', dragDrop);
-    })
-    
+         
+    target.addEventListener('dragover', dragOver);
+    target.addEventListener('dragenter', dragEnter);
+    target.addEventListener('dragleave', dragLeave);
+    target.addEventListener('drop', dragDrop);
+
     target.addEventListener('dragstart', dragStart);
     target.addEventListener('dragend', dragEnd);
 }
