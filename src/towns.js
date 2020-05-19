@@ -37,6 +37,27 @@ const homeworkContainer = document.querySelector('#homework-container');
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
 function loadTowns() {
+  return new Promise(function(resolve) {
+    const xhr = new XMLHttpRequest();
+
+    xhr.open('GET', 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json')
+    xhr.responseType = 'json'
+    xhr.send();
+    xhr.addEventListener('load', function() {
+        const towns = xhr.response.sort(function (a, b) {
+            if (a.name > b.name) {
+                return 1;
+            } else if (a.name < b.name) {
+                return -1;
+            }
+            
+            return 0;
+        })
+        
+        resolve(towns);
+        
+    })
+  });
 }
 
 /*
@@ -51,20 +72,53 @@ function loadTowns() {
    isMatching('Moscow', 'Moscov') // false
  */
 function isMatching(full, chunk) {
+    if (full.toLowerCase().indexOf(chunk.toLowerCase()) !== -1 ) {
+        return true;
+    }
+
+    return false;
 }
 
-/* Блок с надписью "Загрузка" */
-const loadingBlock = homeworkContainer.querySelector('#loading-block');
-/* Блок с текстовым полем и результатом поиска */
-const filterBlock = homeworkContainer.querySelector('#filter-block');
-/* Текстовое поле для поиска по городам */
-const filterInput = homeworkContainer.querySelector('#filter-input');
-/* Блок с результатами поиска */
-const filterResult = homeworkContainer.querySelector('#filter-result');
+  const loadingBlock = homeworkContainer.querySelector('#loading-block');
+
+  const filterBlock = homeworkContainer.querySelector('#filter-block');
+
+  const filterInput = homeworkContainer.querySelector('#filter-input');
+
+  const filterResult = homeworkContainer.querySelector('#filter-result');
+  
+  const successLoadTowns = loadTowns();
+
+
+  successLoadTowns.then(function () {
+    loadingBlock.style.display = 'none';
+    filterBlock.style.display = 'block';
+  })
 
 filterInput.addEventListener('keyup', function() {
-    // это обработчик нажатия кливиш в текстовом поле
+   
+  successLoadTowns.then(function (towns) {
+      if (filterInput.value !== '') {
+          filterResult.textContent = '';
+
+          towns.forEach(function(town) {
+              if (isMatching(town.name, filterInput.value)) {
+                createDivs(town.name)
+              }
+          }) 
+      } else {
+          filterResult.textContent = '';
+      }
+          
+  })
+  
 });
+
+const createDivs = function (elem) {
+  const div = document.createElement('div')
+  div.textContent = elem;
+  filterResult.appendChild(div);
+}
 
 export {
     loadTowns,
