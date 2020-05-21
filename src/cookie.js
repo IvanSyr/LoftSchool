@@ -43,10 +43,86 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
-filterNameInput.addEventListener('keyup', function() {
-    // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
+addButton.addEventListener('click', () => {
+  document.cookie = `${addNameInput.value}=${addValueInput.value}`;
+
+  addNameInput.value = '';
+  addValueInput.value = '';
+
+  createList(parseCookies()) ;
 });
 
-addButton.addEventListener('click', () => {
-    // здесь можно обработать нажатие на кнопку "добавить cookie"
+const parseCookies = function () {
+    const cookie = document.cookie;
+
+    return cookie.split('; ').reduce((prev, current)=>{
+        let [name, value] = current.split('=');
+
+        prev[name] = value;
+
+        return prev;
+    }, {})
+}
+
+
+
+filterNameInput.addEventListener('keyup', function() {
+    listTable.textContent = '';
+
+    for(let key in parseCookies()) {
+        if (isMatching(key, filterNameInput.value)) {
+            createList(key, parseCookies()[key])
+        }
+    }
 });
+
+const isMatching = function (fill, chunk) {
+    if (fill.toLowerCase().indexOf(chunk.toLowerCase()) !== -1) {
+        return true;
+    }
+
+    return false;
+}
+
+const createList = function (key, val) {
+    const name = key;
+    const value = val;
+
+    const tdName = document.createElement('td');
+    const tdValue = document.createElement('td');
+    const tdButton = document.createElement('button');
+    tdButton.classList.add(name);
+    tdButton.setAttribute('Delete', 'удали меня');
+
+    tdName.textContent = name;
+    tdValue.textContent = value;
+    tdButton.textContent = 'удалить';
+
+    const tr = document.createElement('tr');
+    tr.classList.add(name);
+
+    tr.appendChild(tdName);
+    tr.appendChild(tdValue);
+    tr.appendChild(tdButton);
+
+    listTable.appendChild(tr);
+}
+
+window.addEventListener('load', function () {
+    for ( let key in parseCookies()) {
+        createList(key, parseCookies()[key]);
+    }
+})
+
+window.addEventListener('DOMContentLoaded', function () {
+  parseCookies()
+
+    listTable.addEventListener('click', function (event) {
+        if (event.target.hasAttribute('Delete')) {
+            listTable.removeChild(event.target.closest('tr'))
+            document.cookie = `${event.target.className}=''; expires='Thu, 01 Jan 1970 00:00:01 GMT'`;
+        }
+    })
+})
+
+console.log(parseCookies())
