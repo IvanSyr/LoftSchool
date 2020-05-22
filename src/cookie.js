@@ -44,12 +44,24 @@ const addButton = homeworkContainer.querySelector('#add-button');
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
 addButton.addEventListener('click', () => {
-  document.cookie = `${addNameInput.value}=${addValueInput.value}`;
+    document.cookie = `${addNameInput.value}=${addValueInput.value}`;
+    
+    listTable.textContent = '';
+    
+    if (filterNameInput.value) {
+        if (isMatching(addNameInput.value, filterNameInput.value) || isMatching(addValueInput.value, filterNameInput.value)) {
+            createList(filter(filterNameInput.value, parseCookies()));
+        }
+        if (parseCookies().hasOwnProperty(addNameInput.value) && !isMatching(addValueInput.value, filterNameInput.value)) {
+            // listTable.removeChild(listTable.querySelector("'." + addNameInput.value + "'"));
+        }
 
-  addNameInput.value = '';
-  addValueInput.value = '';
+    } else {
+        createList(parseCookies());
+    }
 
-  createList(parseCookies()) ;
+    addNameInput.value = '';
+    addValueInput.value = '';
 });
 
 const parseCookies = function () {
@@ -64,17 +76,25 @@ const parseCookies = function () {
     }, {})
 }
 
-
-
 filterNameInput.addEventListener('keyup', function() {
     listTable.textContent = '';
 
-    for(let key in parseCookies()) {
-        if (isMatching(key, filterNameInput.value)) {
-            createList(key, parseCookies()[key])
-        }
-    }
+    const filterResult = filter(filterNameInput.value, parseCookies());
+
+    createList(filterResult);
 });
+
+const filter = function (val, obj) {
+  const filtObj = {};
+
+  for(let key in obj) {
+      if (isMatching(key, val) || isMatching(obj[key], val)) {
+          filtObj[key] = obj[key];
+      }
+  }
+
+  return filtObj;
+}
 
 const isMatching = function (fill, chunk) {
     if (fill.toLowerCase().indexOf(chunk.toLowerCase()) !== -1) {
@@ -84,39 +104,37 @@ const isMatching = function (fill, chunk) {
     return false;
 }
 
-const createList = function (key, val) {
-    const name = key;
-    const value = val;
+const createList = function (obj) {
+    for (let key in obj) {
+        const name = key;
+        const value = obj[key];
 
-    const tdName = document.createElement('td');
-    const tdValue = document.createElement('td');
-    const tdButton = document.createElement('button');
-    tdButton.classList.add(name);
-    tdButton.setAttribute('Delete', 'удали меня');
+        const tdName = document.createElement('td');
+        const tdValue = document.createElement('td');
+        const tdButton = document.createElement('button');
+        tdButton.classList.add(name);
+        tdButton.setAttribute('Delete', 'удали меня');
 
-    tdName.textContent = name;
-    tdValue.textContent = value;
-    tdButton.textContent = 'удалить';
+        tdName.textContent = name;
+        tdValue.textContent = value;
+        tdButton.textContent = 'удалить';
 
-    const tr = document.createElement('tr');
-    tr.classList.add(name);
+        const tr = document.createElement('tr');
+        tr.classList.add(name);
 
-    tr.appendChild(tdName);
-    tr.appendChild(tdValue);
-    tr.appendChild(tdButton);
+        tr.appendChild(tdName);
+        tr.appendChild(tdValue);
+        tr.appendChild(tdButton);
 
-    listTable.appendChild(tr);
+        listTable.appendChild(tr);
+    }
 }
 
 window.addEventListener('load', function () {
-    for ( let key in parseCookies()) {
-        createList(key, parseCookies()[key]);
-    }
+    createList(parseCookies());
 })
 
 window.addEventListener('DOMContentLoaded', function () {
-  parseCookies()
-
     listTable.addEventListener('click', function (event) {
         if (event.target.hasAttribute('Delete')) {
             listTable.removeChild(event.target.closest('tr'))
@@ -124,5 +142,3 @@ window.addEventListener('DOMContentLoaded', function () {
         }
     })
 })
-
-console.log(parseCookies())
